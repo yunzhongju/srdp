@@ -6,7 +6,7 @@
 			<Top><img src="../assets/img/practiceplace.png" alt=""></Top>
 			<div class="content">
 				<!-- 搜索 -->
-				<Serach placeholder="搜索关键词"></Serach>
+				<Serach placeholder="搜索关键词" @onHandleSerach="onHandleSerach"></Serach>
 				<Tags :list="areaList" @onHandleClick="onHandleClickTag"></Tags>
 <!-- 				<div class="filter">
 					<div class="filter-item" @click="showPopup=true">
@@ -28,17 +28,21 @@
 				</div> -->
 				<div class="show-list-outer">
 					<div class="show-list-inner">
-						<div class="show-list-item" v-for="(item,index) in list">
-							<img :src="item.image" />
+						<div v-if="list.length===0" class="empty">暂无数据</div>
+						<div 
+							class="show-list-item" 
+							@click="onHandleToDetail(item.id)"
+							v-for="(item,index) in list">
+							<img :src="item.imagePath" />
 							<div class="right">
 								<h1 class="set-ellipsis1">{{item.title}}</h1>
 								<p>
-									<span class="set-ellipsis1">{{item.addr}}</span>
-									<span><2.1km</span>
+									<span class="set-ellipsis1">来源:{{item.source}}</span>
+									<!-- <span><2.1km</span> -->
 								</p>
 								<div>
-									<span>{{item.time}}</span>
-									<span>{{item.phone}}</span>
+									<span>时间:{{item.addTime|timeFormate}}</span>
+									<!-- <span>电话:18323213134</span> -->
 								</div>
 							</div>
 						</div>
@@ -64,6 +68,8 @@
 		
 		<QuickNav
 			class="quick-nav"
+			@onHandleUp="onHandleUp"
+			@onHandleNext="onHandleNext"
 			@onHandleWechat="$router.push('/')"
 			@onHandleBack="$router.go(-1)"
 			></QuickNav>
@@ -96,73 +102,66 @@ export default {
 			areaList:[],
 			currentDate: new Date(),
 			value1:'',
+			pageSize:10,
+			pageNumber:1,
 			showPopup:false,
-	options: [{
-				value: '选项1',
-				label: '黄金糕'
-			}, {
-				value: '选项2',
-				label: '双皮奶'
-			}, {
-				value: '选项3',
-				label: '蚵仔煎'
-			}, {
-				value: '选项3',
-				label: '蚵仔煎'
-			}, {
-				value: '选项3',
-				label: '蚵仔煎'
-			}],
 			value: '',
-			list: [
-				{
-					id: 1,
-					image: 'https://img.yasuotu.com/uploads/2021/01/05/5ff4034a8b754_5ff4034a9dd76.png?time=1609827147',
-					title: '高新区新文明实践中心撒大萨达大苏打',
-					addr: '高新区新文明实践中心十大打算打的啊大苏打',
-					time: '开放时间:9:00-21:00',
-					phone: '电话:1323****2432'
-				},
-				{
-					id: 1,
-					image: 'https://img.yasuotu.com/uploads/2021/01/05/5ff4034a8b754_5ff4034a9dd76.png?time=1609827147',
-					title: '高新区新文明实践中心撒大萨达大苏打',
-					addr: '高新区新文明实践中心十大打算打的啊大苏打',
-					time: '开放时间:9:00-21:00',
-					phone: '电话:1323****2432'
-				},
-				{
-					id: 1,
-					image: 'https://img.yasuotu.com/uploads/2021/01/05/5ff4034a8b754_5ff4034a9dd76.png?time=1609827147',
-					title: '高新区新文明实践中心撒大萨达大苏打',
-					addr: '高新区新文明实践中心十大打算打的啊大苏打',
-					time: '开放时间:9:00-21:00',
-					phone: '电话:1323****2432'
-				},
-				{
-					id: 1,
-					image: 'https://img.yasuotu.com/uploads/2021/01/05/5ff4034a8b754_5ff4034a9dd76.png?time=1609827147',
-					title: '高新区新文明实践中心撒大萨达大苏打',
-					addr: '高新区新文明实践中心十大打算打的啊大苏打',
-					time: '开放时间:9:00-21:00',
-					phone: '电话:1323****2432'
-				}
-			]
+			list: []
 		};
 	},
 	methods:{
+		onHandleUp(){
+			if(this.pageNumber!==1){
+				this.pageNumber-=1
+				this.getNewsList({pageSize:this.pageSize,pageNumber:this.pageNumber})
+			}
+		},
+		onHandleNext(){
+			this.pageNumber+=1
+			this.getNewsList({pageSize:this.pageSize,pageNumber:this.pageNumber})
+		},
+		onHandleSerach(val){
+			this.getNewsList({pageSize:this.pageSize,pageNumber:this.pageNumber,searchContent:val})
+		},
 		onHandleClickTag(item){
-			
+			this.getNewsList({pageSize:this.pageSize,pageNumber:this.pageNumber,district:item.orgid})
+		},
+		onHandleToDetail(id){
+			this.$router.push({
+				path:'/detail',
+				query:{
+					id:id
+				}
+			})
 		},
 		getAreas(params){
 			getAreasAPI(params).then(res=>{
 				this.areaList=res
 			})
 		},
+		getNewsList(params){
+			params['userId']=0
+			getNewsListAPI(params).then(res=>{
+				// console.log(res);
+				this.list=res.list
+			})
+		}
 	},
 	created() {
 		this.getAreas({parentId:this.parentId})
-	}
+		this.getNewsList({pageSize:this.pageSize,pageNumber:this.pageNumber})
+	},
+	filters: {
+		timeFormate(time) {
+			let timer = new Date(time*1000);
+			let y = timer.getFullYear();
+			let m = timer.getMonth() + 1 < 10 ? '0' + (timer.getMonth() + 1) : timer.getMonth() + 1;
+			let d = timer.getDate() > 10 ? timer.getDate() : '0' + timer.getDate();
+			let h = timer.getHours() < 10 ? '0' + timer.getHours() : timer.getHours();
+			let mint = timer.getMinutes() < 10 ? '0' + timer.getMinutes() : timer.getMinutes();
+			return y + '.' + m + '.' + d;
+		}
+	},
 };
 </script>
 
@@ -281,7 +280,8 @@ export default {
 .el-filter{
 	margin-top: 30px;
 }
-// .set-option{
-// 	font-size: 30px;
-// }
+.empty{
+	font-size: 40px;
+	color: gray;
+}
 </style>

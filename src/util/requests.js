@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 axios.defaults.timeout = 10000;
-console.log(axios.defaults,11111);
+// console.log(axios.defaults,11111);
 // axios.defaults.baseURL = 'http://132.232.74.143:5612/';
 axios.defaults.baseURL = '/api';
 // 请求拦截器

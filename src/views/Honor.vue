@@ -135,9 +135,9 @@
 			}
 		},
 		created() {
-			getHonourListlAPI({}).then(res=>{
-				console.log(res);
-			})
+			// getHonourListlAPI({}).then(res=>{
+			// 	console.log(res);
+			// })
 		}
 	}
 </script>
