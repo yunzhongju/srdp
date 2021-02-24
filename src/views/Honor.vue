@@ -7,105 +7,31 @@
 		<div class="context">
 			<Serach placeholder="搜索关键词"></Serach>
 			<div class="choose">
-				<span class="active">
-					时代楷模
-					<img src="../assets/img/choice_p.png" alt="">
-				</span>
-				<span>
-					时代楷模
-					<img src="../assets/img/choice_n.png" alt="">
-				</span>
-				<span>
-					时代楷模
-					<img src="../assets/img/choice_n.png" alt="">
-				</span>
-				<span>
-					时代楷模
-					<img src="../assets/img/choice_n.png" alt="">
-				</span>
-				<span>
-					时代楷模
-					<img src="../assets/img/choice_n.png" alt="">
+				<span 
+					:class="{'active':activeList.includes(item.sortNum)}" 
+					@click="onHandleClickTips(item)"
+					v-for="(item,index) in tips">
+					{{item.title}}
+					<img src="../assets/img/choice_p.png" v-show="activeList.includes(item.sortNum)">
+					<img src="../assets/img/choice_n.png" v-show="!activeList.includes(item.sortNum)">
 				</span>
 			</div>
-			
+			<PullDown 
+				class="PullDown" 
+				:list="times" 
+				@onHandleClear="onHandleClear"
+				@onHandleClickTime="onHandleClickTime"></PullDown>
 			<div class="show-list">
-				<div class="list-item">
+				<div class="empty" v-if="honorList.length===0">暂无数据</div>
+				<div class="list-item" v-for="(item,index) in honorList">
 					<img src="../assets/img/newsitem.png" alt="">
 					<div class="right">
-						<h1>【时代楷模】雪域高原上的守望耕耘者——嘉律</h1>
+						<h1>{{item.title}}——{{item.personName}}</h1>
 						<div>
-							<span>2020.01.01</span>
-							<span>来源: 西藏文明网</span>
+							<span>{{item.createTime|handleDate}}</span>
+							<span>来源: {{item.origin}}</span>
 						</div>
-						<p @click="onHandleToDetail">【查看详情】</p>
-					</div>
-				</div>
-				
-				<div class="list-item">
-					<img src="../assets/img/newsitem.png" alt="">
-					<div class="right">
-						<h1>【时代楷模】雪域高原上的守望耕耘者——嘉律</h1>
-						<div>
-							<span>2020.01.01</span>
-							<span>来源: 西藏文明网</span>
-						</div>
-						<p>【查看详情】</p>
-					</div>
-				</div>
-				<div class="list-item">
-					<img src="../assets/img/newsitem.png" alt="">
-					<div class="right">
-						<h1>【时代楷模】雪域高原上的守望耕耘者——嘉律</h1>
-						<div>
-							<span>2020.01.01</span>
-							<span>来源: 西藏文明网</span>
-						</div>
-						<p>【查看详情】</p>
-					</div>
-				</div>
-				<div class="list-item">
-					<img src="../assets/img/newsitem.png" alt="">
-					<div class="right">
-						<h1>【时代楷模】雪域高原上的守望耕耘者——嘉律</h1>
-						<div>
-							<span>2020.01.01</span>
-							<span>来源: 西藏文明网</span>
-						</div>
-						<p>【查看详情】</p>
-					</div>
-				</div>
-				<div class="list-item">
-					<img src="../assets/img/newsitem.png" alt="">
-					<div class="right">
-						<h1>【时代楷模】雪域高原上的守望耕耘者——嘉律</h1>
-						<div>
-							<span>2020.01.01</span>
-							<span>来源: 西藏文明网</span>
-						</div>
-						<p>【查看详情】</p>
-					</div>
-				</div>
-				<div class="list-item">
-					<img src="../assets/img/newsitem.png" alt="">
-					<div class="right">
-						<h1>【时代楷模】雪域高原上的守望耕耘者——嘉律</h1>
-						<div>
-							<span>2020.01.01</span>
-							<span>来源: 西藏文明网</span>
-						</div>
-						<p>【查看详情】</p>
-					</div>
-				</div>
-				<div class="list-item">
-					<img src="../assets/img/newsitem.png" alt="">
-					<div class="right">
-						<h1>【时代楷模】雪域高原上的守望耕耘者——嘉律</h1>
-						<div>
-							<span>2020.01.01</span>
-							<span>来源: 西藏文明网</span>
-						</div>
-						<p>【查看详情】</p>
+						<p @click="onHandleToDetail(item.userRecordId)">【查看详情】</p>
 					</div>
 				</div>
 			</div>
@@ -117,32 +43,93 @@
 	import Logo from '../components/Logo.vue'
 	import Nav from '../components/Nav.vue'
 	import Serach from '../components/Serach.vue'
-	import {getHonourListlAPI} from '../api/api.js'
+	import PullDown from '../components/PullDown.vue'
+	import {getHonourListAPI,getHonourRecordAPI,getHonourUserTipAPI} from '../api/api.js'
 	export default {
 		components:{
 			Logo,
 			Nav,
-			Serach
+			Serach,
+			PullDown
 		},
 		data(){
 			return {
-				honorList:[]
+				honorList:[],
+				tips:[],
+				activeList:[],
+				times:[],
+				recordId:''
 			}
 		},
 		methods:{
-			onHandleToDetail(){
-				this.$router.push('/detail')
+			onHandleToDetail(id){
+				this.$router.push({
+					path:'/detail',
+					query:{
+						id:id,
+						type:'honor'
+					}
+				})
+			},
+			onHandleClickTime(item){
+				console.log(item);
+				this.recordId=item.recordId
+				this.getHonourList({recordId:item.recordId})
+			},
+			onHandleClear(){
+				this.recordId=''
+				this.getHonourList()
+			},
+			onHandleClickTips(item){
+				if(this.activeList.includes(item.sortNum)){
+					this.activeList=this.activeList.filter((num)=>{return num!==item.sortNum})
+				}else{
+					this.activeList.push(item.sortNum)
+				}
+				let tip=this.activeList.join(";")
+				console.log(tip);
+				this.getHonourList({tip:tip,recordId:this.recordId})
+			},
+			getHonourList(params={}){
+				getHonourListAPI(params).then(res=>{
+					console.log('list',res);
+					this.honorList=res
+				})
+			},
+			getHonourRecord(){
+				getHonourRecordAPI().then(res=>{
+					console.log('time',res);
+					this.times=res
+				})
+			},
+			getHonourUserTip(){
+				getHonourUserTipAPI().then(res=>{
+					console.log('tip',res);
+					this.tips=res
+				})
 			}
 		},
 		created() {
-			// getHonourListlAPI({}).then(res=>{
-			// 	console.log(res);
-			// })
+			this.getHonourList()
+			this.getHonourRecord()
+			this.getHonourUserTip()
+		},
+		filters:{
+			handleDate(d){
+				return d.split(' ')[0]
+			}
 		}
 	}
 </script>
 
 <style lang="less" scoped>
+	.empty{
+		color: grey;
+		font-size: 40px;
+	}
+	.PullDown{
+		margin-top: 30px;
+	}
 	.context{
 		box-sizing: border-box;
 		margin-top: 20px;
@@ -178,7 +165,7 @@
 		margin-top: 20px;
 		display: flex;
 		flex-direction: column;
-		height: 1000px;
+		height: 1100px;
 		overflow-y: auto;
 		-ms-overflow-style: none;
 		overflow: -moz-scrollbars-none;
@@ -187,6 +174,7 @@
 			justify-content: space-between;
 			margin-top: 30px;
 			.right{
+				flex: 1;
 				box-sizing: border-box;
 				padding-left: 20px;
 				display: flex;
@@ -201,9 +189,9 @@
 				div{
 					display: flex;
 					justify-content: space-between;
-					font-size: 30px;
+					font-size: 28px;
 					color: gray;
-					align-items: center;
+					text-align: left;
 				}
 				p{
 					color: red;

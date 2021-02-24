@@ -17,7 +17,7 @@
 				<div class="info">
 					<img :src="detail.imagePath" alt="">
 					<div class="info-right">
-						<h1 class="set-ellipsis1">{{detail.title}}</h1>
+						<h1 class="set-ellipsis2">{{detail.title}}</h1>
 						<div class="set-ellipsis4">{{detail.resume?detail.resume:'暂无描述'}}</div>
 					</div>
 				</div>

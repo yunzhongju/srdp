@@ -8,10 +8,11 @@
 		</Nav>
 		
 		<div class="context">
-			<h1>{{detail.title}}</h1>
+			<h1>{{type?detail.title+'——'+detail.personName:detail.title}}</h1>
 			<div class="info">
-				<span>发布时间 : {{detail.addTime|timeFormate}}</span>
-				<span>来源 : {{detail.source}}</span>
+				<span v-if="!type">发布时间 : {{detail.addTime|timeFormate}}</span>
+				<span v-if="type">发布时间 : {{detail.createTime|handleDate}}</span>
+				<span>来源 : {{detail.source?detail.source:detail.origin}}</span>
 			</div>
 			<div class="newsContent" v-html="detail.content"></div>
 		</div>
@@ -21,7 +22,7 @@
 <script>
 	import Logo from '../components/Logo.vue'
 	import Nav from '../components/Nav.vue'
-	import {getNewsDetailAPI} from '../api/api.js'
+	import {getNewsDetailAPI,getHonourUserDetailAPI} from '../api/api.js'
 	export default {
 		components:{
 			Logo,
@@ -31,15 +32,23 @@
 			return{
 				id:'',
 				detail:'',
-				userId:0
+				userId:0,
+				type:''
 			}
 		},
 		created() {
 			this.id=this.$route.query.id
-			getNewsDetailAPI({id:this.id,userId:this.userId}).then(res=>{
-				// console.log(res);
-				this.detail=res
-			})
+			this.type=this.$route.query.type
+			if(this.type){
+				getHonourUserDetailAPI({userRecordId:this.id}).then(res=>{
+					console.log('honor',res);
+					this.detail=res
+				})
+			}else{
+				getNewsDetailAPI({id:this.id,userId:this.userId}).then(res=>{
+					this.detail=res
+				})
+			}
 		},
 		filters: {
 			timeFormate(time) {
@@ -50,6 +59,9 @@
 				let h = timer.getHours() < 10 ? '0' + timer.getHours() : timer.getHours();
 				let mint = timer.getMinutes() < 10 ? '0' + timer.getMinutes() : timer.getMinutes();
 				return y + '.' + m + '.' + d;
+			},
+			handleDate(d){
+				return d?d.split(' ')[0]:0
 			}
 		},
 	}

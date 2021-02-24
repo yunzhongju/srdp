@@ -8,7 +8,13 @@ export const getNewsListAPI = params =>{return get('/wxa/news/getNewsList', para
 //获取新闻详情
 export const getNewsDetailAPI = params => {return get('/wxa/news/getNewsDetailById', params)}
 //光荣榜
-export const getHonourListlAPI = params => {return get('/circle/getHonourList', params)}
+export const getHonourListAPI = params => {return get('/honour/getHonourList', params)}
+//获取光荣榜记录年份
+export const getHonourRecordAPI = params => {return get('/honour/getHonourRecord', params)}
+//获取光荣榜人员详情
+export const getHonourUserDetailAPI = params => {return get('/honour/getHonourUserDetail', params)}
+//获取光荣榜人员标签
+export const getHonourUserTipAPI = params => {return get('/honour/getHonourUserTip', params)}
 //获取视频列表
 export const getVideoListAPI = params => {return get('/wxa/video/getVideoList', params)}
 //获取行政区划（新）

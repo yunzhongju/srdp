@@ -1,10 +1,7 @@
 <template>
-	<div :style="'height:'+height+'px;'">
-		<!-- <Vr :vr="vr"></Vr> -->
-		<div style="height: 93.2%;">
+	<div class="show-vr">
+		<div class="up">
 			<iframe
-				width="100%" 
-				height='100%' 
 				frameborder='0' 
 				align='center' 
 				allowfullscreen='true' 
@@ -12,29 +9,30 @@
 				id='iframe' 
 				:src="vr"/>
 		</div>
-		<div class="show-back">
+		<div class="down">
 			<transition
-			    name="custom-classes-transition"
-			    enter-active-class="animated bounceInLeft"
-			    leave-active-class="animated bounceOutLeft"
+					name="custom-classes-transition"
+					enter-active-class="animated bounceInLeft"
+					leave-active-class="animated bounceOutLeft"
 			>
-			    <img 
+					<img 
 						v-show="show" 
 						@click="$router.go(-1)"
 						src="../assets/img/floor_btn_back.png" alt="">
 			</transition>
 			<img @click="show=!show" src="../assets/img/floor_btn.png" alt="">
 			<transition
-			    name="custom-classes-transition"
-			    enter-active-class="animated bounceInRight"
-			    leave-active-class="animated bounceOutRight"
+					name="custom-classes-transition"
+					enter-active-class="animated bounceInRight"
+					leave-active-class="animated bounceOutRight"
 			>
-			    <img 
+					<img 
 						v-show="show" 
 						@click="$router.push('/')"
 						src="../assets/img/floor_btn_wechat.png" alt="">
 			</transition>
 		</div>
+
 	</div>
 </template>
 
@@ -48,7 +46,7 @@
 			return {
 				vr:'',
 				show:true,
-				height:window.innerHeight
+				height:window.innerHeight-750/1080*130
 			}
 		},
 		created() {
@@ -61,20 +59,31 @@
 </script>
 
 <style lang="less" scoped>
-	.show-back{
-		position: fixed;
+	.show-vr{
 		display: flex;
-		justify-content: space-around;
-		background-color: black;
-		bottom: 0;
-		width: 100%;
-		left: 0;
-		z-index: 10000;
-		opacity: .9;
-		img{
-			margin-left: 20px;
+		flex-direction: column;
+		height: 100%;
+		.up{
+				flex: 1;
+				// background-color: red;
+				iframe{
+					height: 100%;
+					width: 100%;
+				}
+		}
+		.down{
 			height: 130px;
-			width: 130px;
+			background-color: black;
+			display: flex;
+			justify-content: space-around;
+			background-color: black;
+			opacity: .9;
+			img{
+				margin-left: 20px;
+				height: 130px;
+				width: 130px;
+			}
 		}
 	}
+
 </style>

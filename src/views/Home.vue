@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-		<div class="contain">
+		<div class="contain ">
 			<!-- logo -->
 			<div class="logo">
 				<img src="../assets/img/logo.png" alt="">
@@ -9,11 +9,11 @@
 			<div class="sr-show-data">
 				<ul>
 					<li>
-						<span class="color1">{{service.volunteerCount}}</span>
+						<span class="color1">{{service.volunteerCount?service.volunteerCount:0}}</span>
 						<span>志愿者</span>
 					</li>
 					<li>
-						<span class="color2">{{service.circleCount}}</span>
+						<span class="color2">{{service.circleCount?service.circleCount:0}}</span>
 						<span>服务队</span>
 					</li>
 					<li>
@@ -21,7 +21,7 @@
 						<span>服务时长</span>
 					</li>
 					<li>
-						<span class="color4">{{service.practicePositionCount}}</span>
+						<span class="color4">{{service.practicePositionCount?service.practicePositionCount:0}}</span>
 						<span>实践机构</span>
 					</li>
 				</ul>
@@ -168,7 +168,7 @@ export default {
 		},
 		getStatistics(){
 			getStatisticsAPI({}).then(res=>{
-				console.log(res);
+				// console.log(res);
 				this.service=res
 			})
 		}

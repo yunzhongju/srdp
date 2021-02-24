@@ -19,7 +19,7 @@
 						v-for="(item,index) in newsList"
 						@click="onHandleNewsDetail(item.id)">
 						<img :src="item.imagePath" alt="">
-						<div><span>白金村</span></div>
+						<div><span class="setTitle">{{item.title}}</span></div>
 					</div>
 				</div>
 			</div>
@@ -95,6 +95,11 @@ export default {
 </script>
 
 <style lang="less" scoped>
+	.setTitle{
+		width: 200px;
+		overflow: hidden;
+		white-space: nowrap;
+	}
 	.content {
 		margin-top: 35px;
 		height: 1480px;
